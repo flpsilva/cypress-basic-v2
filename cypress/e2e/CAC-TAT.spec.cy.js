@@ -9,7 +9,7 @@ describe('Central de Atendimento ao Cliente TAT', function() {
   //  cy.get('#userName').type(Cypress.env('user_name'), { log: false })
   //    .get('#password').type(Cypress.env('user_password'), { log: false })
 
-
+//#region Tests
   it('Verify the application title', () => {
      cy.title().should('be.equal','Central de Atendimento ao Cliente TAT')
   });
@@ -170,4 +170,5 @@ describe('Central de Atendimento ao Cliente TAT', function() {
     cy.visit('./src/privacy.html')
       .contains('Talking About Testing')
   });
+  //#endregion
 })

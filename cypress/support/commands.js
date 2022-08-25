@@ -1,3 +1,4 @@
+//#region examples
 // ***********************************************
 // This example commands.js shows you how to
 // create various custom commands and overwrite
@@ -23,6 +24,7 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+//#endregion
 Cypress.Commands.add('fillMandatoryfieldsAndSubmit', () =>{
     cy.get('#firstName').type('felipe')
     cy.get('#lastName').type('almeida')
