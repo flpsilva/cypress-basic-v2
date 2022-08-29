@@ -7,7 +7,8 @@
     "cy:open": "cypress open",
     "cy:open:mobile": "cypress open --config viewportWidth=370 viewportHeight=660",
     "test": "cypress run",
-    "test:mobile": "cypress run --config viewportWidth=370 viewportHeight=660"
+    "test:mobile": "cypress run --config viewportWidth=370 viewportHeight=660",
+    "cy:open2": "cypress open --config-file=cypress.config.js"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,6 @@
   "license": "MIT",
   "homepage": "https://github.com/wlsf82/cypress-basico-v2#readme",
   "devDependencies": {
-    "cypress": "^10.6.0"
+    "cypress": "^9.5.0"
   }
 }
