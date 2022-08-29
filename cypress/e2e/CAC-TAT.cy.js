@@ -1,22 +1,27 @@
 /// <reference types="Cypress" />
 
 describe('Central de Atendimento ao Cliente TAT', function() {
+  const THREE_SECONDS_IN_MS = 3000
   beforeEach(()=>{
     cy.visit('./src/index.html')
   })
   //how to do login using private data:
   //Ex:
   //  cy.get('#userName').type(Cypress.env('user_name'), { log: false })
-  //    .get('#password').type(Cypress.env('user_password'), { log: false })
+  // .get('#password').type(Cypress.env('user_password'), { log: false })
 
 //#region Tests
+  //Cypress._.times() Use lodash to run the test multiple times
+  Cypress._.times(3, () => {
   it('Verify the application title', () => {
-     cy.title().should('be.equal','Central de Atendimento ao Cliente TAT')
-  });
+    cy.title().should('be.equal','Central de Atendimento ao Cliente TAT')
+  })
+  })
 
   it('Fill in the required fields and send the form', () => {
     const longText = 'test, test, test, test, test, test, test, test, test, test, test, test, test, test' 
     //variable ^
+    cy.clock()
     cy.get('#firstName').type('felipe')
         .get('#lastName').type('almeida')
         .get('#email').type('test@gmail.com')
@@ -25,15 +30,21 @@ describe('Central de Atendimento ao Cliente TAT', function() {
         //(type delay has 10 seconds as default)
         .get('button[type="submit"]').click()
         .get('.success').should('be.visible')
+        .tick(THREE_SECONDS_IN_MS)
+        .get('.success').should('not.be.visible')
   });
 
+
   it('Display an error message when trying to submit the form using a invalid formatting email', () => {
+    cy.clock()
     cy.get('#firstName').type(Cypress.env('user_name'))
         .get('#lastName').type(Cypress.env('user_password'))
         .get('#email').type('test@test')
         .get('#open-text-area').type('test')
         .get('button[type="submit"]').click()
         .get('[class="error"]').should('be.visible')
+        .tick(THREE_SECONDS_IN_MS)
+        .get('[class="error"]').should('not.be.visible')
   });
 
   it('The phone field remains empty when filled with non-numeric value', () => {
@@ -43,6 +54,7 @@ describe('Central de Atendimento ao Cliente TAT', function() {
   });
 
   it('Displays error message when phone number becomes required but not filled in before form submission', () => {
+    cy.clock()
     cy.get('#firstName').type('felipe')
       .get('#lastName').type('almeida')
       .get('#email').type('test@test.com')
@@ -50,6 +62,8 @@ describe('Central de Atendimento ao Cliente TAT', function() {
       .get('#phone-checkbox').check()
       .get('button[type="submit"]').click()
       .get('.error').should('be.visible')
+      .tick(THREE_SECONDS_IN_MS)
+      .get('.error').should('not.be.visible')
   });
 
   it('Fill and clear the input field: name, last name, email, text area, and phone number', () => {
@@ -77,14 +91,20 @@ describe('Central de Atendimento ao Cliente TAT', function() {
   });
 
   it('Displays an error message when submitting the form without filling the required fields', () => {
+    cy.clock()
     cy.get('button[type="submit"]').click()
       .get('[class="error"]').should('be.visible')
+      .tick(THREE_SECONDS_IN_MS)
+      .get('[class="error"]').should('not.be.visible')
 
   });
 
-  it('submit form successfully using a custom command', () => {
+  it('Submit form successfully using a custom command', () => {
+    cy.clock()
     cy.fillMandatoryfieldsAndSubmit()
       .get('.success').should('be.visible')
+      .tick(THREE_SECONDS_IN_MS)
+      .get('.success').should('not.be.visible')
   });
 
   it('Select a product (YouTube) by its text', () => {
@@ -159,7 +179,7 @@ describe('Central de Atendimento ao Cliente TAT', function() {
     cy.get('#privacy a').should('have.attr', 'target', '_blank')
   })
 
-  it('Access the privacy policy page by removing the target and then clicking on the link', () => {
+  it.only('Access the privacy policy page by removing the target and then clicking on the link', () => {
     cy.get('#privacy a')
       .invoke('removeAttr', 'target')
       .click()
@@ -169,6 +189,52 @@ describe('Central de Atendimento ao Cliente TAT', function() {
   it('Access the privacy policy page by src (extra exercise)', () => {
     cy.visit('./src/privacy.html')
       .contains('Talking About Testing')
+  });
+
+  it('Display and hide success and error messages using .invoke', () => {
+    cy.get('.success')
+      .should('not.be.visible')
+      .invoke('show')
+      .should('be.visible')
+      .and('contain', 'Mensagem enviada com sucesso.')
+      .invoke('hide')
+      .should('not.be.visible')
+    cy.get('.error')
+      .should('not.be.visible')
+      .invoke('show')
+      .should('be.visible')
+      .and('contain', 'Valide os campos obrigatórios!')
+      .invoke('hide')
+      .should('not.be.visible')
+  })
+  it('Simulates sending a CTRL+V command to paste a long text on a textarea field', () => {
+    const longText = Cypress._.repeat('0123456789', 20)
+    cy.get('#open-text-area')
+      .invoke('val', longText)
+      .should('have.value', longText)
+  });
+
+  it('Execute an HTTP request', () => {
+    cy.request('https://cac-tat.s3.eu-central-1.amazonaws.com/index.html')
+      .should(function(response){
+        //console.log(response)
+        const{ status, statusText, body } = response
+        expect(status).to.equal(200)
+        expect(statusText).to.equal('OK')
+        expect(body).to.include('CAC TAT')
+      })
+  });
+
+  it('Find the hidden cat icon', () => {
+    cy.get('#cat')
+      .invoke('show')
+      .should('be.visible')
+      //extras function of .invoke =>
+    cy.get('#title')
+      .invoke('text', 'CAT TAT')
+    cy.get('#subtitle')
+      .invoke('text', 'I like cats')
+
   });
   //#endregion
 })
